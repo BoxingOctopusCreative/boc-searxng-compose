@@ -22,7 +22,7 @@ services:
     networks:
       - searxng
     ports:
-      - "127.0.0.1:8080:8080"
+      - "127.0.0.1:8888:8888"
     labels:
       - traefik.enable=true
       - traefik.http.routers.searxng.rule=Host(`search.boxingoctopus.io`)
@@ -30,7 +30,7 @@ services:
       - traefik.http.routers.searxng.entrypoints=websecure
       - traefik.http.routers.searxng.service=searxng
       - traefik.http.routers.searxng.tls.certresolver=leresolver
-      - traefik.http.services.searxng.loadbalancer.server.port=8080
+      - traefik.http.services.searxng.loadbalancer.server.port=8888
       - traefik.http.middlewares.searxng.headers.SSLRedirect=true
       - traefik.http.middlewares.searxng.headers.STSSeconds=315360000
       - traefik.http.middlewares.searxng.headers.browserXSSFilter=true
