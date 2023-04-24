@@ -1,0 +1,73 @@
+version: '3.7'
+
+services:
+  redis:
+    container_name: redis
+    image: "redis:alpine"
+    command: redis-server --save "" --appendonly "no"
+    networks:
+      - searxng
+    tmpfs:
+      - /var/lib/redis
+    cap_drop:
+      - ALL
+    cap_add:
+      - SETGID
+      - SETUID
+      - DAC_OVERRIDE
+
+  searxng:
+    container_name: searxng
+    image: searxng/searxng:latest
+    networks:
+      - searxng
+    ports:
+      - "127.0.0.1:8080:8080"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.searxng.rule=Host(`search.boxingoctopus.io`)
+      - traefik.http.routers.searxng.tls=true
+      - traefik.http.routers.searxng.entrypoints=websecure
+      - traefik.http.routers.searxng.service=searxng
+      - traefik.http.routers.searxng.tls.certresolver=leresolver
+      - traefik.http.services.searxng.loadbalancer.server.port=8080
+      - traefik.http.middlewares.searxng.headers.SSLRedirect=true
+      - traefik.http.middlewares.searxng.headers.STSSeconds=315360000
+      - traefik.http.middlewares.searxng.headers.browserXSSFilter=true
+      - traefik.http.middlewares.searxng.headers.contentTypeNosniff=true
+      - traefik.http.middlewares.searxng.headers.forceSTSHeader=true
+      - traefik.http.middlewares.searxng.headers.SSLHost=boxingoctopus.io
+      - traefik.http.middlewares.searxng.headers.STSIncludeSubdomains=true
+      - traefik.http.middlewares.searxng.headers.STSPreload=true
+    volumes:
+      - searxng:/etc/searxng:rw
+      - searxng_img:/usr/local/searxng/searx/static/themes/simple/img
+
+    environment:
+      - SEARXNG_BASE_URL=https://${SEARXNG_HOSTNAME:-localhost}/
+      - TZ=America/Toronto
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+      - DAC_OVERRIDE
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+        max-file: "1"
+
+networks:
+  default:
+    external: true
+    name: portainer_default
+
+  searxng:
+    ipam:
+      driver: default
+
+volumes:
+  searxng:
+  searxng_img:
