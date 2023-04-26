@@ -41,7 +41,7 @@ services:
       - traefik.http.middlewares.searxng.headers.STSPreload=true
     volumes:
       - searxng:/etc/searxng:rw
-      - searxng_img:/usr/local/searxng/searx/static/themes/simple/img
+      #- searxng_img:/usr/local/searxng/searx/static/themes/simple/img
 
     environment:
       - SEARXNG_BASE_URL=https://${SEARXNG_HOSTNAME:-localhost}/
@@ -70,4 +70,4 @@ networks:
 
 volumes:
   searxng:
-  searxng_img:
+  #searxng_img:
