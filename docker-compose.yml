@@ -5,6 +5,7 @@ services:
     container_name: redis
     image: "redis:alpine"
     command: redis-server --save "" --appendonly "no"
+    restart: unless-stopped
     networks:
       - searxng
     tmpfs:
@@ -19,6 +20,7 @@ services:
   searxng:
     container_name: searxng
     image: searxng/searxng:latest
+    restart: unless-stopped
     networks:
       - searxng
     ports:
@@ -43,7 +45,6 @@ services:
     volumes:
       - searxng:/etc/searxng:rw
       #- searxng_img:/usr/local/searxng/searx/static/themes/simple/img
-
     environment:
       - SEARXNG_BASE_URL=https://${SEARXNG_HOSTNAME:-localhost}/
       - TZ=America/Toronto
